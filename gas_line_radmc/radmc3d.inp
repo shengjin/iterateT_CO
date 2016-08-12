@@ -1,0 +1,10 @@
+istar_sphere = 0
+nphot = 100000
+nphot_scat = 0
+rto_style = 3
+
+rto_single = 1
+setthreads = 1
+scattering_mode_max=0
+
+tgas_eq_tdust = 1
