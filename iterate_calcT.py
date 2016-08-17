@@ -117,16 +117,16 @@ def onerun(result_dir):
     os.system('./dust.manu_density_based_amr.py')
     os.system('cp dustkappa_dust.inp.imag dustkappa_dust.inp -f')
     
-    os.system('./radmc3d image lambda 866.9627371918420522  npix 400 incl 51 posang 151 sizeau 1200 noline')
+    os.system('./radmc3d image lambda 866.9627371918420522  npix 400 incl 51 posang 151 sizeau 1400 noline')
     os.system('./image_conv_azimth_extract.py')
     cmd = "mv AU_fluxJy ./results/%s/Au_fluxJy_dust"%(result_dir)
     os.system(cmd)
     os.system('mv image.out image.out.12co')
     
-    os.system('./radmc3d image lambda 906.8455757791763290 npix 400 incl 51 posang 151 sizeau 1200 noline')
+    os.system('./radmc3d image lambda 906.8455757791763290 npix 400 incl 51 posang 151 sizeau 1400 noline')
     os.system('mv image.out image.out.13co')
     
-    os.system('./radmc3d image lambda 910.3083452186419890 npix 400 incl 51 posang 151 sizeau 1200 noline')
+    os.system('./radmc3d image lambda 910.3083452186419890 npix 400 incl 51 posang 151 sizeau 1400 noline')
     os.system('mv image.out image.out.c18o')
     
     os.system('cp dust_density.binp ./gas_line_radmc')
