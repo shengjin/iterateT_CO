@@ -47,11 +47,11 @@ if fit_gas:
 
 # fitted parameter for dust 
 if fit_dust:
-    Mdisk = 0.000027         # gas disk mass in solar mass
-    gamma = -0.15  #  power-law index
-    r_c   = 68.0        #  the radial size of the gas disk in AU
-    r_c_tan   = 69.0    #  the radial size of the gas disk in AU
-    gamma_atan = 4.35
+    Mdisk = 0.1         # gas disk mass in solar mass
+    gamma = 1.0          #  power-law index
+    r_c   = 12500.0        #  the radial size of the gas disk in AU
+    r_c_tan   = 0.001        #  the radial size of the gas disk in AU
+    gamma_atan = 2.0
 
     minimum  = 0.000
     #
@@ -186,7 +186,10 @@ surf1g = np.zeros(nrad_grid, dtype=float)
 ######## manually set the density profile
 
 print "write the gas surface density ascii", "\n"
-SigmaC = Mdisk*Msun*(2.0-gamma)/(2.0*math.pi*(r_c*AU)**2.0)
+if 1.0-gamma == -1:
+    SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/(math.log(600.0/r_c)-math.log(5.0/r_c))
+if 1.0-gamma != -1:
+    SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/((600.0/r_c)**(2.0-gamma)/(2.0-gamma)-(5.0/r_c)**(2.0-gamma)/(2.0-gamma))
 
 
 if fit_dust:
@@ -197,7 +200,7 @@ if fit_dust:
             hr = h_2_r*20*AU* (rr/20.0/AU)**1.25
             isurf_1 = SigmaC*(rad[k]/(AU*r_c))**(-gamma) * math.exp(-(rad[k]/(AU*r_c))**(2.0-gamma)) 
             surf_min = isurf_1 * minimum
-            isurf = isurf_1 * math.atan((rr/(AU*r_c_tan))**gamma_atan)
+            isurf = isurf_1 * math.atan((rr/(AU*r_c_tan))**gamma_atan) / 1.57079632679
             if isurf < surf_min:
                 isurf = surf_min
             if (rr/AU < inner_cavity):
