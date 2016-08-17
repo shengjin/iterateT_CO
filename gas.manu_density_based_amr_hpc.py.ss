@@ -161,7 +161,10 @@ surf1g = np.zeros(nrad_grid, dtype=float)
 ######## manually set the density profile
 
 print "write the gas surface density ascii", "\n"
-SigmaC = Mdisk*Msun*(2.0-gamma)/(2.0*math.pi*(r_c*AU)**2.0)
+if 1.0-gamma == -1:
+    SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/(math.log(600.0/r_c)-math.log(5.0/r_c))
+if 1.0-gamma != -1:
+    SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/((600.0/r_c)**(2.0-gamma)/(2.0-gamma)-(5.0/r_c)**(2.0-gamma)/(2.0-gamma))
 
 
 
@@ -177,7 +180,7 @@ if fit_gas:
             surf_min = minimum_v 
         else:
             surf_min = isurf_1 * minimum
-        isurf = isurf_1 * math.atan((rr/(AU*r_c_tan))**gamma_atan)
+        isurf = isurf_1 * math.atan((rr/(AU*r_c_tan))**gamma_atan)  / 1.57079632679
         if (isurf < surf_min) and (rr/AU < r_c) and (rr/AU > innerdisk_r) :
             isurf = surf_min
         if inner_hole:
