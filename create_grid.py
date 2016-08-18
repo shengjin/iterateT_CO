@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 import numpy as np
 
-gamma = [0.5, 1, 1.5, 2]
+Sigma_0 = [0.6e-3, 3.0e-3, 6.0e-3]
 rc  = [12500]
-rc_atan  = [15, 25, 35, 45]
+gamma = [0.5, 0.8, 1.1, 1.4]
+rc_atan  = [5, 15, 25, 35]
 gamma_atan = [1, 2, 3, 4]
-Sigma_0 = [7.5e-4, 3.0e-3, 7.5e-3, 2.0e-2]
 
 #nrun = len(gamma)*len(rc)*len(gamma_atan)*len(rc_atan)*len(Sigma_0)
 
@@ -21,6 +21,6 @@ for i in range(len(Sigma_0)):
 		    h = h + 1
 wfile.close()
 
-result_dir = "0001"
+#result_dir = "0001"
 #onerun(result_dir)
     
