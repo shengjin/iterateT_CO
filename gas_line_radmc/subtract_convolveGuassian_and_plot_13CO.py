@@ -87,8 +87,9 @@ gaus_pa  =   2.329190826416E+01
 gaus_ma_arcsec = gaus_ma*3600
 gaus_mi_arcsec = gaus_mi*3600
 if gaus_pa > 0:
-    gaus_pa_ctclk  = 180.0-gaus_pa  # PA in imConv
+    gaus_pa_ctclk  = gaus_pa  # PA in imConv
 else:
+    quit()
     gaus_pa_ctclk  = -gaus_pa  # PA in imConv
 
 fwhm = [gaus_ma_arcsec, gaus_mi_arcsec]
