@@ -110,7 +110,7 @@ def onerun(result_dir):
         text = ""
         print i, "  ", np.average(temp_diff), "  ", temp_diff.max()
         time.sleep(10)
-        if (np.average(temp_diff) < 0.01) and (temp_diff.max() < 0.05) and  (i > 2):
+        if (np.average(temp_diff) < 0.03) and (temp_diff.max() < 0.03) and  (i > 1):
             break
     
     os.system('cp amr_grid.inp ./gas_line_radmc')
