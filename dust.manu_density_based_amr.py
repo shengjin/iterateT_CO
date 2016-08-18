@@ -47,11 +47,15 @@ if fit_gas:
 
 # fitted parameter for dust 
 if fit_dust:
-    Mdisk = 0.1         # gas disk mass in solar mass
-    gamma = 1.0          #  power-law index
-    r_c   = 12500.0        #  the radial size of the gas disk in AU
-    r_c_tan   = 0.001        #  the radial size of the gas disk in AU
-    gamma_atan = 2.0
+    Mdisk = 0.0076         # gas disk mass in solar mass
+    # 0.0076  34.23       # gas disk mass in solar mass
+    # 0.0075 chi 42.36
+    # high 0.01
+    # low 0.005
+    gamma = -0.15 #  power-law index
+    r_c   = 68.0        #  the radial size of the gas disk in AU
+    r_c_tan   = 69.0        #  the radial size of the gas disk in AU
+    gamma_atan = 4.35
 
     minimum  = 0.000
     #
