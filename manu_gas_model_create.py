@@ -19,7 +19,7 @@ nthet=30
 nphi=1
 
 
-rad_min = 5.0
+rad_min = 0.5
 rad_max = 600.0
 scaling_radius = 1.0
 lograd = False #True
