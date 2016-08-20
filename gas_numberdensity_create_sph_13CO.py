@@ -548,7 +548,7 @@ for i in range(nr_cyl):
 # scaling the gas density using scaling factor
 for i in range(nr_cyl):
     for j in range(nphi):
-        gas_rho_3d[i,j,:] = gas_rho_3d[i,j,:]*scaling_dens[i,j]
+        gas_rho_3d[i,j,:] = gas_rho_3d[i,j,:]*scaling_dens[i,j]*0.5
 print "Scaling the gas density based the hydro surface density. DONE", "\n"
 
 ### plot a vertical slice of the new gas_rho_3d
