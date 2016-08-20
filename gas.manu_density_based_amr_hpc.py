@@ -6,6 +6,8 @@ import numpy as np
 import math
 import struct
 
+from scipy.integrate import quad
+
 #sys.path.append('/turquoise/users/sjin/python/')
 
 import matplotlib as mpl
@@ -19,8 +21,6 @@ fit_gas  = True
 #write_gas3d_density  = True 
 write_gas3d_density  = False
 
-inner_hole = False
-hole_size = 7.5  # cavity size in AU
 
 write_temp = True
 tan_crit = 0.1  # two-layer model temperature boundary
@@ -28,20 +28,16 @@ tan_crit = 0.1  # two-layer model temperature boundary
 ## Sigma_ = SigmaC * (r/RC)**-gamma * exp( -(r/RC)**(2-gamma)) * atan((r/RC)**gamma_atan)
 
 if fit_gas:
-    Mdisk = 0.00075         # gas disk mass in solar mass
-    gamma = 1.0          #  power-law index
-    r_c_tan   = 35.0     #  the radial size of the gas disk in AU
-    r_c   = 12500.0        #  the radial size of the gas disk in AU
-    gamma_atan = 2.0
+    exp_decay = False
+    Mdisk = 0.001         # gas disk mass in solar mass
+    gamma = 1.1          #  power-law index
+    rc_atan   = 25.0     #  the radial size of the gas disk in AU
+    r_c   = 1.0        #  the radial size of the gas disk in AU
+    gamma_atan = 4.0
 
-    minimum  = 0.10
-    #
-    gas2dust = 100
-    min_number = True
-    minimum_v  = 0.000
-    innerdisk_r = 5     # boundary of the inner disk
-    innerdisk_hr_scale = 5  # hr_innerdisk/hr
-    innerdisk_D = 0.00  # density of the inner disk
+    rmin = 0.5
+    rmax = 600.0
+
 
 #filename1 = "%s%s" % ("./","dust_temperature.bdat")
 
@@ -161,10 +157,29 @@ surf1g = np.zeros(nrad_grid, dtype=float)
 ######## manually set the density profile
 
 print "write the gas surface density ascii", "\n"
-if 1.0-gamma == -1:
-    SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/(math.log(600.0/r_c)-math.log(5.0/r_c))
-if 1.0-gamma != -1:
-    SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/((600.0/r_c)**(2.0-gamma)/(2.0-gamma)-(5.0/r_c)**(2.0-gamma)/(2.0-gamma))
+if exp_decay:
+    # NOTE. not right here
+    # NOTE. here approximated using a pure powerlaw
+    if 1.0-gamma == -1:
+        SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/(math.log(600.0/r_c)-math.log(5.0/r_c))
+    if 1.0-gamma != -1:
+        SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/((600.0/r_c)**(2.0-gamma)/(2.0-gamma)-(5.0/r_c)**(2.0-gamma)/(2.0-gamma))
+else:
+    def integrand(x, a, b):
+        return x**(1.0-a)*math.atan(x**b)
+    x_lo = rmin/rc_atan
+    x_hi = rmax/rc_atan
+    I = quad(integrand, x_lo, x_hi, args=(gamma,gamma_atan))
+    SigmaC = Mdisk*Msun/(2.0*math.pi)/I[0]/((rc_atan*AU)**(2-gamma))
+    print I
+    print Mdisk*Msun/(2.0*math.pi)/((rc_atan*AU)**(2-gamma))
+    print SigmaC
+
+#SigmaC = Mdisk*Msun/(2.0*math.pi)/((r_c*AU)**2.0)/(math.log(600.0/r_c)-math.log(5.0/r_c))
+print 
+print SigmaC
+
+#quit()
 
 
 
@@ -175,20 +190,16 @@ if fit_gas:
     rhogas_2d = np.zeros((nphi_grid, nrad_grid), dtype=float)
     for j in range(nrad_grid):
         rr = rad_grid[j]
-        isurf_1 = SigmaC * (rad_grid[j]/(AU*r_c))**(-gamma) * math.exp(-(rad_grid[j]/(AU*r_c))**(2.0-gamma))
-        if min_number:
-            surf_min = minimum_v 
+        if exp_decay:
+            isurf_1 = SigmaC * (rad_grid[j]/(AU*r_c))**(-gamma) * math.exp(-(rad_grid[j]/(AU*r_c))**(2.0-gamma))
         else:
-            surf_min = isurf_1 * minimum
-        isurf = isurf_1 * math.atan((rr/(AU*r_c_tan))**gamma_atan)  / 1.57079632679
-        if (isurf < surf_min) and (rr/AU < r_c) and (rr/AU > innerdisk_r) :
-            isurf = surf_min
-        if inner_hole:
-            if rr/AU < hole_size:
-                isurf = 0
-                print isurf
-        if (rr/AU < innerdisk_r) :
-            isurf = innerdisk_D
+            isurf_1 = SigmaC * rad_grid[j]**(-gamma) 
+        #
+        if exp_decay:
+            isurf = isurf_1 * math.atan((rr/(AU*rc_atan))**gamma_atan) / 1.5707963267948966
+        else:
+            isurf = isurf_1 * math.atan((rr/(AU*rc_atan))**gamma_atan)
+        #
         rhogas_2d[:,j] = isurf
         surf1g[j] = isurf
     # calculate total disk mass
