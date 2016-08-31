@@ -167,6 +167,10 @@ if remove_dust:
         image_dust = readImage(imagedust)
         image.image[:,:,i] = image.image[:,:,i] - image_dust.image[:,:,0]
         image.imageJyppix[:,:,i] = image.imageJyppix[:,:,i] - image_dust.imageJyppix[:,:,0]
+        print image.wav[i]
+        freq = cc*1000/(image.wav[i]/1e6)
+        dv = (freq-RST_freq)/RST_freq*cc #/3.0
+        print freq, RST_freq, dv
 
 
 
@@ -243,6 +247,10 @@ for i in range(n_row):
         if j==0:
             axes[i,j].set_ylabel('arcsec')
         axes[i,j].set_xlabel('arcsec')
+        freq = cc*1000/(image.wav[n_col*i+j+jump]/1e6)
+        dv = (freq-RST_freq)/RST_freq*cc #/3.0
+        axes[i,j].text(-1, 2.7, r'%.2f%s'%(dv, " km/s"), color='red', fontsize=13)
+        print freq, dv
 
 #plt.tight_layout()
 plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9, hspace=0.0, wspace=0.0)
@@ -466,6 +474,11 @@ for i in range(n_row):
         if j==0:
             axes[i,j].set_ylabel('arcsec')
         axes[i,j].set_xlabel('arcsec')
+        freq = cc*1000/(image.wav[n_col*i+j+jump]/1e6)
+        dv = (freq-RST_freq)/RST_freq*cc #/3.0
+        axes[i,j].text(-1, 2.7, r'%.2f%s'%(dv, " km/s"), color='red', fontsize=13)
+
+
         #for tick in axes[i,j].get_xticklabels():
         #    tick.set_rotation(45)
 
