@@ -23,14 +23,15 @@ remove_dust = True
 newfile = False
 #newfile = True
 
-RST_freq = 3.457959900000E+11
-freq_delt = 2.422247656860E+05
+#RST_freq = 3.457959900000E+11
+#freq_delt = 2.422247656860E+05
 
-#RST_freq = 3.305912230320E+11
+#RST_freq = 3.305879810270E+11
 #freq_delt = 2.315717818604E+05
+#9.068462110105153897e+02
 
-#RST_freq = 3.293335270120E+11
-#freq_delt = 6.591170815430E+05
+RST_freq = 3.293335270120E+11
+freq_delt = 2.16044E+05
 
 cc = 299792.458  #km.s^-1
 dv = freq_delt/RST_freq*cc #/3.0
@@ -67,9 +68,9 @@ tiny = 1e-30
 #gaus_pa = 2.383443450928E+01    # PA of maj axis of Guass measure East from North
 
 # 12CO
-gaus_ma = 9.943533274863E-05                                                  
-gaus_mi = 6.375448157390E-05
-gaus_pa =  3.046934509277E+01                    
+#gaus_ma = 9.943533274863E-05                                                  
+#gaus_mi = 6.375448157390E-05
+#gaus_pa =  3.046934509277E+01                    
 
 # 13CO
 #gaus_ma  =   7.848847243521E-05                                                  
@@ -77,9 +78,9 @@ gaus_pa =  3.046934509277E+01
 #gaus_pa  =   2.329190826416E+01 
 
 # C18O
-#gaus_ma  =   8.189328842693E-05                                                  
-#gaus_mi  =   6.247880558173E-05                                                  
-#gaus_pa  =   2.386120986938E+01 
+gaus_ma  =   8.189328842693E-05                                                  
+gaus_mi  =   6.247880558173E-05                                                  
+gaus_pa  =   2.386120986938E+01 
 
 # HL Tau
 #gaus_ma = 8.367259158856E-06*3.5
@@ -168,9 +169,6 @@ if remove_dust:
         image.image[:,:,i] = image.image[:,:,i] - image_dust.image[:,:,0]
         image.imageJyppix[:,:,i] = image.imageJyppix[:,:,i] - image_dust.imageJyppix[:,:,0]
         print image.wav[i]
-        freq = cc*1000/(image.wav[i]/1e6)
-        dv = (freq-RST_freq)/RST_freq*cc #/3.0
-        print freq, RST_freq, dv
 
 
 
