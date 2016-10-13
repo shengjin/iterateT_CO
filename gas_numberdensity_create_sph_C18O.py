@@ -49,9 +49,11 @@ dbase_sty = "leiden" # the datebase format of gas radiative properties
                      # abundance(12CO) = 3.0e-4
 #mu_molecule = 28     # for CO12, 12+16
 
-abundance = 5.5e-7   # 13co/c180 = 5.5 (solar system)
-    #abundance = 4.2e-5   # 13co/c180 = 5.5 (solar system)
+#abundance = 2.57e-7   # 13co/c180 = 5.5 (solar system)
 mu_molecule = 30     # for C18O, 12+18
+loc_divide1 = 45 # boundary of the two regions that have different abundance
+abundance = 2.5e-9   # 13co/c180 = 5.5 (solar system)
+outer_abundance = 2.5e-9 # abundance in the outer part disk
 
 #abundance = 2.3e-6   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
     #abundance = 2.3e-5   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
@@ -73,7 +75,7 @@ sigma_photodisso  = 3e-3  # critical sigma of photodissociation, in g cm^-2
 sigma_photodisso_H = False  # surface density of H2
 
 use_number = True         # use number_photodisso instead of sigma_photodisso
-number_photodisso = 5e20  # number surf_dens of photodissociation, H used
+number_photodisso = 2e20  # number surf_dens of photodissociation, H used
 fnumb_H    = 0.706        # number ratio of H nuclei
 print sigma_photodisso
 print number_photodisso 
@@ -674,7 +676,13 @@ if photodissociation:
 
 
 ### Convert the volume densit to number densty
-gas_number_3d = gas_rho_3d*abundance/mu_molecule/mh
+for i in range(nr_cyl):
+    if r_cyl[i] <= loc_divide1*AU2CM: 
+        #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance)/mu_molecule/mh
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(r_cyl[i]/2.0/loc_divide1/AU2CM))/mu_molecule/mh
+    else:
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(outer_abundance*(r_cyl[i]*4.0/loc_divide1/AU2CM))/mu_molecule/mh
+
 
 if debug_plot:
     #plt.plot(z_cyl/AU2CM, gas_number_3d[15,0,:])

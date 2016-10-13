@@ -53,10 +53,11 @@ dbase_sty = "leiden" # the datebase format of gas radiative properties
     #abundance = 4.2e-5   # 13co/c180 = 5.5 (solar system)
 #mu_molecule = 30     # for C18O, 12+18
 
-abundance = 4.3e-6   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
-    #abundance = 2.3e-5   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
-                     # abundance(13CO) = 3.0e-4
+#abundance = 2.0e-6   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
 mu_molecule = 29     # for 13CO, 13+16
+loc_divide1 = 45 #
+abundance = 3.5e-9   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
+outer_abundance = 3.5e-9 #
 
 
 #abundance = 5e-5   # mass ratio of moleculae 
@@ -73,7 +74,7 @@ sigma_photodisso  = 3e-3  # critical sigma of photodissociation, in g cm^-2
 sigma_photodisso_H = False  # surface density of H2
 
 use_number = True         # use number_photodisso instead of sigma_photodisso
-number_photodisso = 5e20  # number surf_dens of photodissociation, H used
+number_photodisso = 2e20  # number surf_dens of photodissociation, H used
 fnumb_H    = 0.706        # number ratio of H nuclei
 print sigma_photodisso
 print number_photodisso 
@@ -103,7 +104,7 @@ dens2d_name = "%s%s" % ("gas_surface_density", ".ascii")
 ##### make some plots, data_output for debug?
 debug = False        # info printing
 ddebug = False       # CAUTION: info printing inside loops
-debug_plot = False    # make some plots
+debug_plot = True    # make some plots
 debug_data = False   # data output
 debug_tmp = False      # tmp DEBUG
 
@@ -674,7 +675,14 @@ if photodissociation:
 
 
 ### Convert the volume densit to number densty
-gas_number_3d = gas_rho_3d*abundance/mu_molecule/mh
+for i in range(nr_cyl):
+    if r_cyl[i] <= loc_divide1*AU2CM: 
+        #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance)/mu_molecule/mh
+        #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(17/(r_cyl[i]/loc_divide1/AU2CM)))/mu_molecule/mh
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(20/(r_cyl[i]/loc_divide1/AU2CM)))/mu_molecule/mh
+    else:
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(outer_abundance*((r_cyl[i]*2.00/loc_divide1/AU2CM)**2.05))/mu_molecule/mh
+
 
 if debug_plot:
     #plt.plot(z_cyl/AU2CM, gas_number_3d[15,0,:])

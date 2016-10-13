@@ -13,6 +13,7 @@ mpl.use('Agg')   # to avoid the window in plotting
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import LogLocator
+from matplotlib import colors, ticker, cm
 
 #sys.path.append('/turquoise/users/sjin/python/')
 
@@ -45,7 +46,7 @@ moleName  = "12c16o" # the numberDens file will be numberdens_moleName.binp
 dbase_sty = "leiden" # the datebase format of gas radiative properties 
 
 #abundance = 1.4e-4   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
-abundance = 3.0e-4   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
+abundance = 1.4e-4   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
                      # abundance(12CO) = 3.0e-4
 mu_molecule = 28     # for CO12, 12+16
 
@@ -73,7 +74,7 @@ sigma_photodisso  = 3e-3  # critical sigma of photodissociation, in g cm^-2
 sigma_photodisso_H = False  # surface density of H2
 
 use_number = True         # use number_photodisso instead of sigma_photodisso
-number_photodisso = 5e20  # number surf_dens of photodissociation, H used
+number_photodisso = 2e20  # number surf_dens of photodissociation, H used
 fnumb_H    = 0.706        # number ratio of H nuclei
 print sigma_photodisso
 print number_photodisso 
@@ -103,7 +104,7 @@ dens2d_name = "%s%s" % ("gas_surface_density", ".ascii")
 ##### make some plots, data_output for debug?
 debug = False        # info printing
 ddebug = False       # CAUTION: info printing inside loops
-debug_plot = False    # make some plots
+debug_plot = True #False    # make some plots
 debug_data = False   # data output
 debug_tmp = False      # tmp DEBUG
 
@@ -381,20 +382,38 @@ for j in range(nr_cyl):
 print "Calculate temp_cyl_3d by shooting. DONE", "\n"
 
 if debug_plot:
-    #plt.pcolormesh(r_cyl/AU2CM, z_cyl/AU2CM, temp_cyl_3d[:,0,:].T, vmin=10, vmax=200, norm=LogNorm())
-    plt.pcolormesh(r_cyl/AU2CM, z_cyl/AU2CM, temp_cyl_3d[:,0,:].T, vmin=10, vmax=temp_cyl_3d[:,0,:].max(), norm=LogNorm())
-    #plt.ylim([thet[nthet-1],thet[0]])
-    #plt.pcolormesh(rad, phi, temp_3d[:,0,:])
-    plt.xlabel('Radial Distance [AU]')
-    plt.ylabel('Z [AU]')
-    # axes[i,j].set_xticklabels(['-600', '-400', '-200', '0', '200', '400', '600'],rotation=90)
-    ticks_1=[10,20,100,200,500]
-    cbar3=plt.colorbar(ticks=ticks_1)
-    #cbar3=plt.colorbar(ticks = LogLocator(subs=range(10)))  
-    cbar3.ax.set_yticklabels(["10", "20", "100", "200", "500"])
-    cbar3.set_label('Temperature ( K ) ')
+    plt.pcolormesh(r_cyl/AU2CM, z_cyl/AU2CM, temp_cyl_3d[:,0,:].T, vmin=10, vmax=temp_cyl_3d[:,0,:].max(), norm=LogNorm()) #, cmap=cm.coolwarm) #, cmap=cm.PuBu_r)
+    plt.xlabel(r'$r$  $[$ $\mathrm{AU}$ $]$',  fontsize=18)
+    plt.ylabel(r'$z$  $[$ $\mathrm{AU}$ $]$', fontsize=18)
+    plt.xlim(0,600)
+    plt.ylim(0,250)
+    #cbar_ax = fig.add_axes([0.18, 0.08, 0.64, 0.025])
+    #Add a nice little color bar
+    #ticks_1=[10,20,100,200,500]
+    #cbar3=plt.colorbar(ticks=ticks_1)
+    #plt.add_axes([0.15, 0.86, 0.25, 0.02])
+    cbar3 = plt.colorbar(ticks= LogLocator(subs=range(10)), aspect=30, orientation='horizontal')
+    #cbar3 = plt.colorbar(ticks= LogLocator(subs=range(10)), shrink=0.9, pad = 0.05, orientation='horizontal')
+    #cbar3.ax.set_yticklabels(["10", "20", "100", "200", "500"])
+    cbar3.set_label(r'$\mathrm{T}$  $[$ $\mathrm{K}$ $]$', fontsize=16)
     plt.savefig('verticaltemp_cyl.png')
     plt.clf()
+    quit()
+
+    plt, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 17), dpi=80, sharex=True, sharey=True)
+
+    im=axes[1].pcolormesh(r_cyl/AU2CM, z_cyl/AU2CM, temp_cyl_3d[:,0,:].T, vmin=10, vmax=temp_cyl_3d[:,0,:].max(), norm=LogNorm()) 
+    axes[1].set_xlabel(r'$r$  $\mathrm{[AU]}$',  fontsize=28)
+    axes[1].set_ylabel(r'$z$  $\mathrm{[AU]}$', fontsize=28)
+    axes[1].set_xlim(0,600)
+    axes[1].set_ylim(0,250)
+    cbar_ax = plt.add_axes([0.14, 0.04, 0.68, 0.015])
+    cbar=plt.colorbar(im, cax=cbar_ax, ticks= LogLocator(subs=range(10)), orientation='horizontal')
+    cbar.set_label(r'$\mathrm{T}$  $\mathrm{[K]}$', fontsize=24)
+    plt.savefig('verticaltemp_cyl.png')
+    plt.clf()
+
+    quit()
 
 
 ################################
