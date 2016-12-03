@@ -105,6 +105,7 @@ dens2d_name = "%s%s" % ("gas_surface_density", ".ascii")
 debug = False        # info printing
 ddebug = False       # CAUTION: info printing inside loops
 debug_plot = True #False    # make some plots
+debug_numberdens = True #False    # make some plots
 debug_data = False   # data output
 debug_tmp = False      # tmp DEBUG
 
@@ -398,22 +399,19 @@ if debug_plot:
     cbar3.set_label(r'$\mathrm{T}$  $[$ $\mathrm{K}$ $]$', fontsize=16)
     plt.savefig('verticaltemp_cyl.png')
     plt.clf()
-    quit()
 
-    plt, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 17), dpi=80, sharex=True, sharey=True)
+    #plt, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 17), dpi=80, sharex=True, sharey=True)
+    #im=axes[1].pcolormesh(r_cyl/AU2CM, z_cyl/AU2CM, temp_cyl_3d[:,0,:].T, vmin=10, vmax=temp_cyl_3d[:,0,:].max(), norm=LogNorm()) 
+    #axes[1].set_xlabel(r'$r$  $\mathrm{[AU]}$',  fontsize=28)
+    #axes[1].set_ylabel(r'$z$  $\mathrm{[AU]}$', fontsize=28)
+    #axes[1].set_xlim(0,600)
+    #axes[1].set_ylim(0,250)
+    #cbar_ax = plt.add_axes([0.14, 0.04, 0.68, 0.015])
+    #cbar=plt.colorbar(im, cax=cbar_ax, ticks= LogLocator(subs=range(10)), orientation='horizontal')
+    #cbar.set_label(r'$\mathrm{T}$  $\mathrm{[K]}$', fontsize=24)
+    #plt.savefig('verticaltemp_cyl.png')
+    #plt.clf()
 
-    im=axes[1].pcolormesh(r_cyl/AU2CM, z_cyl/AU2CM, temp_cyl_3d[:,0,:].T, vmin=10, vmax=temp_cyl_3d[:,0,:].max(), norm=LogNorm()) 
-    axes[1].set_xlabel(r'$r$  $\mathrm{[AU]}$',  fontsize=28)
-    axes[1].set_ylabel(r'$z$  $\mathrm{[AU]}$', fontsize=28)
-    axes[1].set_xlim(0,600)
-    axes[1].set_ylim(0,250)
-    cbar_ax = plt.add_axes([0.14, 0.04, 0.68, 0.015])
-    cbar=plt.colorbar(im, cax=cbar_ax, ticks= LogLocator(subs=range(10)), orientation='horizontal')
-    cbar.set_label(r'$\mathrm{T}$  $\mathrm{[K]}$', fontsize=24)
-    plt.savefig('verticaltemp_cyl.png')
-    plt.clf()
-
-    quit()
 
 
 ################################
@@ -612,8 +610,13 @@ if gas_freeze:
     for i in range(nr_cyl):
         for j in range(nphi):
             for k in range(nz_cyl):
+                #print i,j,k
+                #print temp_cyl_3d[i,j,k], gas_rho_3d[i,j,k]
                 if temp_cyl_3d[i,j,k] < freeze_T:
                     gas_rho_3d[i,j,k] = 0.0
+                    #print r_cyl_grid[i]/AU2CM,z_cyl_grid[k]/AU2CM,temp_cyl_3d[i,j,k],"Freeze"
+                    #print gas_rho_3d[i,j,k]
+                    #quit()
                     if ddebug:
                         print i,j,k,temp_cyl_3d[i,j,k],"Freeze"
     if debug_plot:
@@ -694,6 +697,26 @@ if photodissociation:
 
 ### Convert the volume densit to number densty
 gas_number_3d = gas_rho_3d*abundance/mu_molecule/mh
+
+### Re-Calculate the sur_face Number density and make a plot
+if debug_numberdens:
+    gas_surf_numb_cyl = np.zeros((nr_cyl,nphi), dtype=float)
+    print "Re-Calculate the sur_face NUMBER density and make a plot.", "\n"
+    for i in range(nr_cyl):
+        for j in range(nphi):
+            rho_surf = 0.0
+            for k in range(nz_cyl):
+                rho_surf = rho_surf + gas_number_3d[i,j,k]*z_len[k]
+            gas_surf_numb_cyl[i,j] = rho_surf
+    np.savetxt('r_cyl_surfNumberDens3.out', np.transpose([r_cyl/AU2CM, gas_surf_numb_cyl[:,0]]))
+    #phi_cyl = np.zeros(nphi)
+    #for i in range(nphi):
+    #    phi_cyl[i] = (phi_grid[i]+phi_grid[i+1])/2.0
+    #plt.pcolormesh(r_cyl/AU2CM, phi_cyl, gas_surf_cyl.T)
+    #plt.colorbar()
+    #plt.savefig('gas_2d_from_ascii_tranform_regenerated_integrated3D.png')
+    #plt.clf()
+
 
 if debug_plot:
     #plt.plot(z_cyl/AU2CM, gas_number_3d[15,0,:])

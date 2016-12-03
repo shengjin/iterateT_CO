@@ -56,8 +56,11 @@ dbase_sty = "leiden" # the datebase format of gas radiative properties
 #abundance = 2.0e-6   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
 mu_molecule = 29     # for 13CO, 13+16
 loc_divide1 = 45 #
-abundance = 3.5e-9   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
-outer_abundance = 3.5e-9 #
+abundance = 2.2e-8   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
+#alpha = 3.5e-9 # power-law dependence of isotope abundance at inner disk
+out_alpha = 1.70 # power-law dependence of isotope abundance at inner disk
+alpha = -4.0 # power-law dependence of isotope abundance at inner disk
+#alpha = -3.0 # power-law dependence of isotope abundance at inner disk
 
 
 #abundance = 5e-5   # mass ratio of moleculae 
@@ -103,6 +106,7 @@ dens2d_name = "%s%s" % ("gas_surface_density", ".ascii")
 
 ##### make some plots, data_output for debug?
 debug = False        # info printing
+debug_numberdens = True
 ddebug = False       # CAUTION: info printing inside loops
 debug_plot = True    # make some plots
 debug_data = False   # data output
@@ -679,9 +683,25 @@ for i in range(nr_cyl):
     if r_cyl[i] <= loc_divide1*AU2CM: 
         #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance)/mu_molecule/mh
         #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(17/(r_cyl[i]/loc_divide1/AU2CM)))/mu_molecule/mh
-        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(20/(r_cyl[i]/loc_divide1/AU2CM)))/mu_molecule/mh
+        #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(20/(r_cyl[i]/loc_divide1/AU2CM)))/mu_molecule/mh
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*((r_cyl[i]/loc_divide1/AU2CM)**alpha) )/mu_molecule/mh
     else:
-        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(outer_abundance*((r_cyl[i]*2.00/loc_divide1/AU2CM)**2.05))/mu_molecule/mh
+        #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*((r_cyl[i]*2.00/loc_divide1/AU2CM)**2.05))/mu_molecule/mh
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*((r_cyl[i]/loc_divide1/AU2CM)**out_alpha))/mu_molecule/mh
+
+
+### Re-Calculate the sur_face Number density and make a plot
+if debug_numberdens:
+    gas_surf_numb_cyl = np.zeros((nr_cyl,nphi), dtype=float)
+    print "Re-Calculate the sur_face NUMBER density and make a plot.", "\n"
+    for i in range(nr_cyl):
+        for j in range(nphi):
+            rho_surf = 0.0
+            for k in range(nz_cyl):
+                rho_surf = rho_surf + gas_number_3d[i,j,k]*z_len[k]
+            gas_surf_numb_cyl[i,j] = rho_surf
+    # make a figure
+    np.savetxt('r_cyl_surfNumberDens.out', np.transpose([r_cyl/AU2CM, gas_surf_numb_cyl[:,0]]))
 
 
 if debug_plot:

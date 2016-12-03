@@ -52,8 +52,9 @@ dbase_sty = "leiden" # the datebase format of gas radiative properties
 #abundance = 2.57e-7   # 13co/c180 = 5.5 (solar system)
 mu_molecule = 30     # for C18O, 12+18
 loc_divide1 = 45 # boundary of the two regions that have different abundance
-abundance = 2.5e-9   # 13co/c180 = 5.5 (solar system)
-outer_abundance = 2.5e-9 # abundance in the outer part disk
+abundance = 6.5e-9   # 13co/c180 = 5.5 (solar system)
+out_alpha = 1.5 # abundance in the outer part disk
+alpha = -2.0 # abundance in the outer part disk
 
 #abundance = 2.3e-6   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
     #abundance = 2.3e-5   # molecule abundance in mass.  rho_mole = rho_H2 * abundance
@@ -105,7 +106,8 @@ dens2d_name = "%s%s" % ("gas_surface_density", ".ascii")
 ##### make some plots, data_output for debug?
 debug = False        # info printing
 ddebug = False       # CAUTION: info printing inside loops
-debug_plot = False    # make some plots
+debug_numberdens = True
+debug_plot = True #False    # make some plots
 debug_data = False   # data output
 debug_tmp = False      # tmp DEBUG
 
@@ -679,9 +681,22 @@ if photodissociation:
 for i in range(nr_cyl):
     if r_cyl[i] <= loc_divide1*AU2CM: 
         #gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance)/mu_molecule/mh
-        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*(r_cyl[i]/2.0/loc_divide1/AU2CM))/mu_molecule/mh
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*((r_cyl[i]/loc_divide1/AU2CM)**alpha))/mu_molecule/mh
     else:
-        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(outer_abundance*(r_cyl[i]*4.0/loc_divide1/AU2CM))/mu_molecule/mh
+        gas_number_3d[i,:,:] = gas_rho_3d[i,:,:]*(abundance*((r_cyl[i]/loc_divide1/AU2CM)**out_alpha))/mu_molecule/mh
+
+### Re-Calculate the sur_face Number density and make a plot
+if debug_numberdens:
+    gas_surf_numb_cyl = np.zeros((nr_cyl,nphi), dtype=float)
+    print "Re-Calculate the sur_face NUMBER density and make a plot.", "\n"
+    for i in range(nr_cyl):
+        for j in range(nphi):
+            rho_surf = 0.0
+            for k in range(nz_cyl):
+                rho_surf = rho_surf + gas_number_3d[i,j,k]*z_len[k]
+            gas_surf_numb_cyl[i,j] = rho_surf
+    # make a figure
+    np.savetxt('r_cyl_surfNumberDens.out', np.transpose([r_cyl/AU2CM, gas_surf_numb_cyl[:,0]]))
 
 
 if debug_plot:
